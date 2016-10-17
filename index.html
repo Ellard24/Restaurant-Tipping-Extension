@@ -1,0 +1,73 @@
+<!doctype html>
+<html>
+  <head>	
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script type="text/javascript">
+      //  $(document).ready(function () {
+       //     $('#user-submit').click(function () {
+         //       var payload = {
+           //         location_id: $('#loc-id').val(),
+	//	    tipping: $('#loc-tip').val()
+	//				
+          //      };
+          //      $.ajax({
+            //        url: "/add",
+              //      type: "POST",
+          //          contentType: "application/json",
+        //            processData: false,
+              //      data: JSON.stringify(payload),
+            //        complete: function (data) {
+                //        $('#output').html(data.responseText);
+                //    }
+ //               });
+   //         });
+   //     });
+
+window.onload = function(){	
+	
+	document.getElementById("user-submit").onclick = function addData(){
+		var xhttp = new XMLHttpRequest();
+		var params = {
+			"location_id": document.getElementById("loc-id").value,
+			"tipping": document.getElementById("loc-tip").value
+		};
+	
+		xhttp.open("POST", "http://52.34.117.11:3211/add", true);
+		xhttp.setRequestHeader("Content-type", "application/json");
+		xhttp.send(JSON.stringify(params));
+
+	};
+
+	document.getElementById("show-data").onclick = function showData(){
+		var xhttp = new XMLHttpRequest();
+		
+		xhttp.open("GET", "http://52.34.117.11:3211/show", true);
+		xhttp.send(null);
+	
+//		console.log('xhr', xhttp.response);
+		var returned = xhttp.responseText;
+		console.log(returned);
+	};	
+	
+
+};
+
+    </script>
+  </head>
+  <body>
+    <h3>Enter a Location ID to enter into the database:</h3>
+    <input id="loc-id" type="text" />
+	<input id="loc-tip" type="text" />
+	<input id="user-submit" type="submit" />
+    <p id="output"></p>
+
+    <h3> Already existing locations in the database:</h3>
+
+    <input id="show-data" type="submit" />
+
+
+	
+
+
+  </body>
+</html>

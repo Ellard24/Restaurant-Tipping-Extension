@@ -1,0 +1,52 @@
+delimiter //
+
+#Unit Test 1 PROCEDURE
+#This will count the number of entries, add a new one and make sure the
+# the number of entries are not the same 
+
+
+
+CREATE PROCEDURE unitTest1()
+BEGIN
+	DECLARE result1;
+	DECLARE result2;
+	
+	
+	#Store initial state into result1
+	SELECT count(location_id) into result1 from locations;
+	
+	#print 
+	SELECT result1;
+	
+	
+	SELECT 'Adding one new entry into database' as ' ';
+	
+	#Insert 1 new value into locations table
+	Insert into locations(location_id, tipping) 
+	Values('test1', '1'); 
+	
+	#Store changed test state into result2
+	SELECT count(location_id) into result2 from locations;
+	
+	#print both results for comparison
+	select result1, result2; 
+	
+	IF result1 < result2 THEN
+		select 'Test Passed: Result2 should be 1 more than Result1' as '';
+	ELSE
+		select 'Test Failed: Result1 should not equal Result2' as '';
+	END IF;
+	
+	
+	#Removes added entry as to not mess up the database
+	Delete from locations WHERE location_id = 'test1';
+
+	
+	#End of test 
+	SELECT 'End of Unit Test 1' as ' ';
+END//
+
+DELIMITER ;
+
+
+CALL unitTest1()

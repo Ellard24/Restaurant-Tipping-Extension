@@ -1,0 +1,189 @@
+/**************************************************************************
+Ellard Gerritsen
+
+
+This is still a work in progress and relies on the super test module
+
+To Do: Since the requests are not done in order, the pool.query and request 
+	comparison will need be to changed to implement callbacks. Otherwise
+	testing data will be off. 
+***************************************************************************/
+
+
+
+
+var request = require('supertest');
+var express = require('express');
+var mysql = require('mysql');
+var bodyParse = require('body-parser');
+
+var app = express();
+
+
+
+request = request('http://52.34.117.11:3211');
+
+
+var pool = mysql.createPool({
+	host: 'localhost',
+	user: 'student',
+	password: 'default',
+	database: 'student'
+});
+
+
+
+function UnitTesting(){
+	
+	
+
+
+
+			request.get('/')
+				.expect(200, function(err){
+					console.log("************************Unit Test: Checking Connection to Server********************************");	
+
+
+					if (!err){
+						console.log("Test Passed:Connection Success");
+						console.log(" ");		
+					}
+					else{
+						console.log(err);
+						console.log(" ");
+					}
+					
+				});
+
+		
+	
+			request.get('/')
+				.expect('failure', function(err){
+					console.log("*****************************Unit Test: Checking against False Expectation.*************************************"); 
+					console.log(" ");
+
+					if (!err){
+						console.log("Test failed: Server should have returned error");
+						console.log(" ");
+					}	
+					else{
+						console.log("Test Passed: Server returned error");
+						console.log(" ");
+					}
+			});
+	
+		
+		
+			request.get('/show')
+				.set('Accept', 'application/json')
+				.expect(200)
+				.end(function(err,res){
+					console.log("***********************************Unit Test: Checking Return Data from /Show Route**************************************");	
+
+					
+					if (!err){
+						console.log("Test Passed. Data in JSON format");
+						console.log("Printing Data");
+						console.log(JSON.parse(res.text));
+						console.log(" ");	
+					
+					
+					} else{
+						console.log("Test Failed. Data should be in JSON format");
+						console.log(" ");
+					}
+
+			});
+
+		
+		
+				
+			var queryCount = 0;
+			pool.query("SELECT * FROM locations", function(err, rows,results){
+				console.log("********************************************Unit Test: Attempting to Retrieve Database data using Node MySql Query********************************************");
+
+				if (err){
+					console.log("TEST FAILED: Could not retrieve tipping data");
+				}
+				else{
+					console.log("TEST PASSED: Successfully retrieved entries from database");
+				//	console.log(results);
+					console.log("Number of Entries from Query:" + rows.length);	
+					queryCount = rows.length;
+
+					
+				}		
+			});
+
+	
+
+			request.get('/show')
+				.set('Accept', 'application/json')
+				.expect(200)
+				.end(function(err,res){
+					console.log("*************************************************Unit Test: Comparing Data Requested via Query vs /show Route******************************************************");
+					console.log(" ");
+					if (!err){
+						console.log("Counting Number of Entries before Addition");
+						var count = 0;
+						var object = JSON.parse(res.text);
+						for (var prop in object){
+							if (object.hasOwnProperty(prop))
+							{
+								count++;
+								//console.log(res.text[prop]);
+							}
+						}
+						console.log(count);
+						
+						if (count != queryCount)
+							console.log("Test Failed:  Count of Entries in Database did not match up");
+						else
+							console.log("Test Passed; Entry Counts matched up");
+						
+					}
+					
+
+			});
+
+			
+			request.post('/add')
+				.set('Accept', 'application/json')
+				.expect(200)
+				.end(function(err,res){
+					console.log("*************************************************Unit Test: Addition of Entry to Database******************************************************");
+					console.log(" ");
+					if (!err){
+						var testParam1 = "testLocation";
+						var testParam2 = "1";
+								
+						pool.query("INSERT INTO locations SET ?, ?", testParam1, testParam2, function(err, result){
+						        if (err){
+						            console.log("Test Failed: Entry was not added");
+						        } else {
+						            console.log("Test Passed: Entry Added.");
+						        }
+						
+						
+						});
+						
+						
+					}
+					
+
+			});
+		
+	
+}
+
+
+UnitTesting();
+
+
+
+
+
+
+
+
+

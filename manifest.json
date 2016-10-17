@@ -1,0 +1,21 @@
+
+{
+	"manifest_version": 2,
+
+	"name": "Eliminate Tipping",
+	"description": "This extension will tell you if a restaurant accepts tips",
+	"version": "0.1",
+
+	"browser_action": {
+		"default_popup": "geocoder_test.html",
+		"default_icon": "give-money.png"
+	},
+
+	"permissions": [
+		"activeTab",
+		"https://maps.google.com/*",
+		"https://maps.googleapis.com/*",
+		"geolocation"
+	],
+	"content_security_policy": "script-src 'self' https://maps.googleapis.com https://maps.gstatic.com; object-src 'self'"
+}
